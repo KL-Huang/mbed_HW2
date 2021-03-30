@@ -2,24 +2,23 @@
 #include "uLCD_4DGL.h"
 
 DigitalIn up(D3);
-DigitalIn down(D4);
+DigitalIn down(D6);
 DigitalIn confirm(D5);
 AnalogOut Aout(PA_4);
 AnalogIn Ain(A0);
 
 uLCD_4DGL uLCD(D1, D0, D2); // serial tx, serial rx, reset pin;
-void out(int i);
 
 int main()
 {
-    int freq[2] = {300, 500, 720};
-    int now = 0; // current frequency index
+    int freq[3] = {300, 500, 720};
+    int now = 3; // current frequency index
     int flag = 0; // enter the selection mode
-    int output = 0; // output the FFT
+    int flag2 = 0; // enter the confirm mode
     int value = 300; // frequency after confirm
+    float value2 = 0.00;
     float period = 1/300;
     int sample = 128;
-    int nsample = 0;
     float ADCdata[128];
 
     up.mode(PullNone);
@@ -33,29 +32,50 @@ int main()
     uLCD.printf("\n   720");
     
     while(1){    
-        out(now % 3);
         if(up) {
             now++; flag = 1;
         }
         else if(down) {
-            now--; flag = 1;
+            now--; 
+            if(now <= 0) now += 3;
+            flag = 1;
         }
         else if (flag & confirm) {
             value = freq[now % 3];
+            value2 = float(value);
+            printf("value = %f\n", value2);
+            flag2 = 1;
             flag = 0;
-            output = 1;
         }
-        period = 1/value;
-        for (float j = 0; j <= period; j = j + 0.01) {
-            Aout = 3 * (j/period);
-            ThisThread::sleep_for(10ms);
+    //    printf("flag2 = %d\n", flag2);
+        uLCD.locate(0,(now % 3) * 2 + 1);
+        uLCD.printf("O");
+        for (int m = 0; m < 11; m++) 
+            if (m != (now % 3) * 2 + 1) {
+                uLCD.locate(0, m);
+                uLCD.printf(" ");
+            }
+        if(flag2) {
+            period = 1.00/value;
+//            for (float j = period; j >= 0.00; j = j - period/1000.00)
+            for (float j = 1.0f; j >= 0.0f; j -= 0.01f) {
+                Aout = j;
+                wait_us(period * 100);
+            //    printf("period = %f\n", period);
+            //    printf("Aout = %f\n", 3.00 * (j/period));
+            //    ThisThread::sleep_for(10ms);
+            }
+            for (int i = 0; i < sample; i++) {
+                ADCdata[i] = Ain;
+                ThisThread::sleep_for(1000ms/sample);
+            }
+            for (int i = 0; i < sample; i++){
+                printf("%f\r\n", ADCdata[i]);
+                ThisThread::sleep_for(100ms);
+            }
+            flag2 = 0;
         }
     }
 }
 
-void out(int i) {
-    uLCD.locate(i * 2,0);
-    uLCD.printf("O");
-    ThisThread::sleep_for(500ms);
-}
 
