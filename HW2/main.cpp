@@ -14,12 +14,13 @@ int main()
     int freq[3] = {300, 500, 720};
     int now = 3; // current frequency index
     int flag = 0; // enter the selection mode
-    int flag2 = 0; // enter the confirm mode
+//    int flag2 = 0; // enter the confirm mode
     int value = 300; // frequency after confirm
     float value2 = 0.00;
     float period = 1/300;
     int sample = 100;
     float ADCdata[100];
+    int x = 0; // index of sample points
 
     up.mode(PullNone);
     down.mode(PullNone);
@@ -44,29 +45,35 @@ int main()
             value = freq[now % 3];
             value2 = float(value);
             printf("value = %f\n", value2);
-            flag2 = 1;
+ //           flag2 = 1;
             flag = 0;
+            x = 0;
         }
         uLCD.locate(0,(now % 3) * 2 + 1);
-        uLCD.printf("O");
-        for (int m = 0; m < 11; m++) 
-            if (m != (now % 3) * 2 + 1) {
-                uLCD.locate(0, m);
-                uLCD.printf(" ");
-            }
+        uLCD.printf("->");
+        for (int m = 0; m < 11; m++) {
+            for (int n = 0; n < 2; n++) 
+                if (m != (now % 3) * 2 + 1) {
+                    uLCD.locate(n, m);
+                    uLCD.printf(" ");
+                }
+        }
         period = 1.00/value;
         for (float j = 1.0f; j >= 0.0f; j -= 0.01f) {
-            int x = 0;
             Aout = j;
             wait_us(period * 100);
-            ADCdata[x] = Ain;
+            if(x < sample) {
+                ADCdata[x] = Ain;
+                x++;
+            }
 //            ThisThread::sleep_for(1000ms/sample);
 //        }
 //        for (int i = 0; i < sample; i++){
-            printf("%f\r\n", ADCdata[x]);
 //            ThisThread::sleep_for(100ms);
-            x++;
         }
+        for (int y = 0; y < sample; y++)
+            printf("%f\r\n", ADCdata[y]);
+        ThisThread::sleep_for(10s);
     }
 }
 
