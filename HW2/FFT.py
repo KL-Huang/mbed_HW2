@@ -2,11 +2,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import serial
 import time
+serdev = '/dev/ttyACM0'
+s = serial.Serial(serdev)
+freq = s.readline()
+ffreq = float(freq)
 
-Fs = 100.0;  # sampling rate
-Ts = 0.1/Fs; # sampling interval
-t = np.arange(0,0.1,Ts) # time vector; create Fs samples between 0 and 1.0 sec.
-y = np.arange(0,0.1,Ts) # signal vector; create Fs samples
+Fs = 200*ffreq/2;  # sampling rate
+Ts = 1.0/Fs; # sampling interval
+t = np.arange(0,1.0/ffreq*2,Ts) # time vector; create Fs samples between 0 and 1.0 sec.
+y = np.arange(0,1.0/ffreq*2,Ts) # signal vector; create Fs samples
 
 n = len(y) # length of the signal
 k = np.arange(n)
@@ -14,9 +18,9 @@ T = n/Fs
 frq = k/T # a vector of frequencies; two sides frequency range
 frq = frq[range(int(n/2))] # one side frequency range
 
-serdev = '/dev/ttyACM0'
-s = serial.Serial(serdev)
-for x in range(0, int(Fs)):
+# serdev = '/dev/ttyACM1'
+#s = serial.Serial(serdev)
+for x in range(0, 200):
     line=s.readline() # Read an echo string from B_L4S5I_IOT01A terminated with '\n'
     # print line
     y[x] = float(line)
@@ -31,5 +35,6 @@ ax[0].set_ylabel('Amplitude')
 ax[1].plot(frq,abs(Y),'r') # plotting the spectrum
 ax[1].set_xlabel('Freq (Hz)')
 ax[1].set_ylabel('|Y(freq)|')
+ax[1].set_xlim(-100, 800)
 plt.show()
 s.close()

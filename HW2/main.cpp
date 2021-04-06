@@ -14,13 +14,15 @@ int main()
     int freq[3] = {300, 500, 720};
     int now = 3; // current frequency index
     int flag = 0; // enter the selection mode
-//    int flag2 = 0; // enter the confirm mode
+    int flag2 = 0; // enter the confirm mode
     int value = 300; // frequency after confirm
     float value2 = 0.00;
     float period = 1/300;
     int sample = 100;
-    float ADCdata[100];
+    float ADCdata[200];
     int x = 0; // index of sample points
+    int stop = 0;
+    float waittime = 0.0;
 
     up.mode(PullNone);
     down.mode(PullNone);
@@ -32,7 +34,7 @@ int main()
     uLCD.printf("\n   500\n");
     uLCD.printf("\n   720");
     
-    while(1){    
+    while(!flag2){    
         if(up) {
             now++; flag = 1;
         }
@@ -44,8 +46,8 @@ int main()
         else if (flag & confirm) {
             value = freq[now % 3];
             value2 = float(value);
-            printf("value = %f\n", value2);
- //           flag2 = 1;
+            printf("%f\r\n", value2);
+            flag2 = 1;
             flag = 0;
             x = 0;
         }
@@ -58,22 +60,36 @@ int main()
                     uLCD.printf(" ");
                 }
         }
-        period = 1.00/value;
+    }
+    period = 1.00/value;
+//    switch(now % 3) {
+//        case 0: waittime = period*10000 - 14.6; break;
+//        case 1: waittime = period*10000 - 15.0; break;
+//        case 2: waittime = period*10000 - 14.8; break;
+//        default: waittime = 0;
+//    }
+    waittime = period*10000 - 14.6;
+//        printf("waittime = %f\n" , waittime);
+    while(1) {
         for (float j = 1.0f; j >= 0.0f; j -= 0.01f) {
             Aout = j;
-            wait_us(period * 100);
-            if(x < sample) {
+            wait_us(waittime);
+            if(x < 2*sample) {
                 ADCdata[x] = Ain;
                 x++;
             }
+//            else x = 0;
 //            ThisThread::sleep_for(1000ms/sample);
 //        }
 //        for (int i = 0; i < sample; i++){
 //            ThisThread::sleep_for(100ms);
         }
-        for (int y = 0; y < sample; y++)
-            printf("%f\r\n", ADCdata[y]);
-        ThisThread::sleep_for(10s);
+        if(!stop && x == 200) {
+            for (int y = 0; y < 2*sample; y++)
+                printf("%f\r\n", ADCdata[y]);
+            stop = 1;
+        }
+//        ThisThread::sleep_for(2s);
     }
 }
 
