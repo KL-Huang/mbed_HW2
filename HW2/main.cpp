@@ -13,7 +13,7 @@ int main()
 {
     int freq[3] = {300, 500, 720};
     int now = 3; // current frequency index
-    int flag = 0; // enter the selection mode
+//int flag = 0; // enter the selection mode
     int flag2 = 0; // enter the confirm mode
     int value = 300; // frequency after confirm
     float value2 = 0.00;
@@ -36,19 +36,20 @@ int main()
     
     while(!flag2){    
         if(up) {
-            now++; flag = 1;
+            now++;
+ //           flag = 1;
         }
         else if(down) {
             now--; 
             if(now <= 0) now += 3;
-            flag = 1;
+//            flag = 1;
         }
-        else if (flag & confirm) {
+        else if (confirm) {
             value = freq[now % 3];
             value2 = float(value);
             printf("%f\r\n", value2);
             flag2 = 1;
-            flag = 0;
+//            flag = 0;
             x = 0;
         }
         uLCD.locate(0,(now % 3) * 2 + 1);
