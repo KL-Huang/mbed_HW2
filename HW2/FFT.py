@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import serial
 import time
-serdev = '/dev/ttyACM0'
+serdev = '/dev/ttyACM1'
 s = serial.Serial(serdev)
 freq = s.readline()
 ffreq = float(freq)

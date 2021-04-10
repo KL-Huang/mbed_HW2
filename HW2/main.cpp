@@ -24,9 +24,9 @@ int main()
     int stop = 0;
     float waittime = 0.0;
 
-    up.mode(PullNone);
-    down.mode(PullNone);
-    confirm.mode(PullNone);
+    up.mode(PullDown);
+    down.mode(PullDown);
+    confirm.mode(PullDown);
     uLCD.text_width(2);
     uLCD.text_height(2);
     uLCD.color(WHITE);
