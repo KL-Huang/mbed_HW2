@@ -1,4 +1,4 @@
-## mbed_HW1
+## mbed_HW2
 ### (1) how to setup and run my program:
         * "main.cpp" is the mbed code, "FFT.py" is for Fourier Transform.
         * First, run "main.cpp", and use "screen" to show the printf of the mbed code.
